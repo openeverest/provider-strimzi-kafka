@@ -1,0 +1,17 @@
+module github.com/openeverest/provider-strimzi-kafka
+
+go 1.27.1
+
+require (
+	github.com/openeverest/openeverest/v2 v2.0.0-dev.4
+	k8s.io/api v0.37.1
+	k8s.io/apimachinery v0.37.1
+	sigs.k8s.io/controller-runtime v0.25.1
+)
+
+tool github.com/openeverest/provider-sdk
+
+// TODO: Add your operator dependency, e.g.:
+// require github.com/example/my-operator v1.0.0
+//
+// Then run: go mod tidy
