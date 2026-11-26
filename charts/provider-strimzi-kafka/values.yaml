@@ -62,7 +62,7 @@ securityContext:
 service:
   # -- Service type
   type: ClusterIP
-  # -- Service port for the HTTP server (validation/health endpoints)
+  # -- Service port for the HTTP server (health endpoints)
   port: 8082
   # -- The address the metrics endpoint binds to. Use "0" to disable.
   metricsBindAddress: ":8081"
@@ -124,9 +124,9 @@ provider:
   # used in other contexts where a short concise provider identifier is needed.
   shortName: strimzi-kafka
 
-# -- Default instance presets configuration
+# -- Default cluster instance presets configuration
 # Each preset must have 'name', 'enabled', and 'spec' fields.
-# The 'spec' field contains the full InstancePresetSpec.
+# The 'spec' field contains the full ClusterInstancePresetSpec.
 # Note: The provider shortName will be automatically added to each preset name.
 presets: []
   # Example preset structure:
@@ -157,6 +157,17 @@ extraVolumeMounts: []
 
 # -- Additional volumes to add to the pod
 extraVolumes: []
+
+admission:
+  # -- PEM serving certificate for the Instance admission webhook. Left empty,
+  # the chart generates one and keeps it across upgrades.
+  certs:
+    tls.crt: ""
+    tls.key: ""
+    ca.crt: ""
+  certManager:
+    # -- Issue the serving certificate with cert-manager, which must be installed.
+    enabled: false
 
 # -- Leader election configuration
 leaderElection:

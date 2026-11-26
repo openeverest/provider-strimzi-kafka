@@ -37,29 +37,13 @@ func New() *Provider {
 	}
 }
 
-// Validate checks if the Instance spec is valid.
-//
-// Add your provider-specific validation logic here.
-// Return an error if the spec is invalid.
-//
-// +kubebuilder:rbac:groups=<operator-api-group>,resources=<operator-resources>,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=<operator-api-group>,resources=<operator-resources>/status,verbs=get
-func (p *Provider) Validate(c *controller.Context) error {
-	l := log.FromContext(c.Context())
-	l.Info("Validating instance", "name", c.Name())
-
-	// TODO: Implement validation logic.
-	// Examples:
-	//   - Check that required components are present
-	//   - Validate storage sizes, replica counts
-	//   - Ensure version compatibility
-	return nil
-}
-
 // Sync ensures all required resources exist and are configured correctly.
 //
 // This is the main reconciliation logic. Create or update your
 // operator's custom resource(s) based on the Instance spec.
+//
+// +kubebuilder:rbac:groups=<operator-api-group>,resources=<operator-resources>,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=<operator-api-group>,resources=<operator-resources>/status,verbs=get
 func (p *Provider) Sync(c *controller.Context) error {
 	l := log.FromContext(c.Context())
 	l.Info("Syncing instance", "name", c.Name())
@@ -106,9 +90,9 @@ func (p *Provider) Status(c *controller.Context) (controller.Status, error) {
 	//           },
 	//       ), nil
 	//   }
-	//   return controller.Provisioning("waiting for database to be ready"), nil
+	//   return controller.Progressing("waiting for database to be ready"), nil
 
-	return controller.Provisioning("initializing"), nil
+	return controller.Progressing("initializing"), nil
 }
 
 // Cleanup handles deletion of provider-managed resources.
