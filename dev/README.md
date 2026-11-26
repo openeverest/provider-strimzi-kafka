@@ -81,6 +81,13 @@ All settings live in `dev/.env` (see `dev/.env.example`). Common options:
 > A range such as `>=2.0.0-0 <3.0.0` does not help either: SemVer sorts
 > pre-release labels alphabetically, so `2.0.0-dev.4` ranks above
 > `2.0.0-alpha.1`. Move it together with the core version in `go.mod`.
+>
+> While `go.mod` requires a commit of core `main` whose contract has changed since
+> the last release, the chart's stamp is a development value, such as
+> `2.0.0-alpha.1.next`, and no released core serves this provider: the chart
+> refuses to install on one, and the provider would stay unready there. Run the
+> core from that commit instead, as described below; the last 12 characters of
+> `go list -m -f '{{.Version}}' github.com/openeverest/openeverest/v2` name it.
 
 ## Developing the core and the provider together
 
