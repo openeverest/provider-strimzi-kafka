@@ -7,3 +7,7 @@
 //
 // +k8s:openapi-gen=true
 package components
+
+// KafkaParameters is reserved for engine-level knobs beyond replicas /
+// resources / storage. Empty for the basic dual-role provisioning path.
+type KafkaParameters struct{}

@@ -20,8 +20,4 @@ release: prepare-chart
 .PHONY: deps
 deps:
 	$(HELM) version
-	# TODO: If your provider bundles an operator subchart, add its Helm repo and
-	# resolve dependencies here so `helm dependency build`/`update` can find it.
-	# For example:
-	#   $(HELM) repo add my-operator https://example.com/helm-charts/
-	#   $(HELM) dependency update .
+	$(HELM) dependency update .

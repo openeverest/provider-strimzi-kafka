@@ -10,10 +10,6 @@
 export PROVIDER_ROOT_PATH=${PROVIDER_ROOT_PATH:-${PWD}}
 echo "PROVIDER_ROOT_PATH=${PROVIDER_ROOT_PATH}"
 
-# TODO: pin the versions of your operator and database engine, e.g.:
-#
-# export MY_OPERATOR_VERSION=${MY_OPERATOR_VERSION:-"1.2.3"}
-# echo "MY_OPERATOR_VERSION=${MY_OPERATOR_VERSION}"
-#
-# export MY_DB_ENGINE_VERSION=${MY_DB_ENGINE_VERSION:-"8.0.0"}
-# echo "MY_DB_ENGINE_VERSION=${MY_DB_ENGINE_VERSION}"
+# Strimzi Cluster Operator chart/app version (charts/provider-strimzi-kafka/Chart.yaml).
+export STRIMZI_OPERATOR_VERSION=${STRIMZI_OPERATOR_VERSION:-"1.3.1"}
+echo "STRIMZI_OPERATOR_VERSION=${STRIMZI_OPERATOR_VERSION}"

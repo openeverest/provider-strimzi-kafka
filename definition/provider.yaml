@@ -14,13 +14,9 @@ name: strimzi-kafka
 # The type must match a key in versions.yaml's componentTypes.
 # Add parametersSchema to reference a Go type from components/types.go
 # when a component accepts parameters.
-#
-# Example:
-#   engine:
-#     type: mongod
-#   backup:
-#     type: pbm
-components: {}
+components:
+  engine:
+    type: kafka
 
 # Component types map each type used above to its kind: the shared
 # classification of the software it runs, which monitoring classes filter on.

@@ -1,5 +1,5 @@
-# The smallest Instance of this provider. Copy it per case and change what the
-# case is about.
+# The smallest valid Instance of this provider. Copy it per case and change
+# what the case is about.
 apiVersion: core.openeverest.io/v1alpha1
 kind: Instance
 metadata:
@@ -7,3 +7,12 @@ metadata:
 spec:
   providerRef:
     name: strimzi-kafka
+  version: "4.3.2"
+  topology:
+    type: dualRole
+  components:
+    engine:
+      type: kafka
+      replicas: 1
+      storage:
+        size: 10Gi

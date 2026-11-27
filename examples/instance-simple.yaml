@@ -1,14 +1,22 @@
-# Minimal Instance CR — smallest viable configuration.
+# Minimal dual-role Kafka Instance (1 node) — matches Strimzi
+# examples/kafka/kafka-single-node.yaml shape (RF=1).
 apiVersion: core.openeverest.io/v1alpha1
 kind: Instance
 metadata:
-  name: my-database-simple
+  name: my-kafka-simple
 spec:
   providerRef:
     name: strimzi-kafka
+  version: "4.3.2"
+  topology:
+    type: dualRole
   components:
     engine:
-      type: 
+      type: kafka
       replicas: 1
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
       storage:
         size: 10Gi

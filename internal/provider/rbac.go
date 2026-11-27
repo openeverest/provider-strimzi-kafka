@@ -15,20 +15,11 @@ package provider
 // +kubebuilder:rbac:groups=events.k8s.io,resources=events,verbs=create;patch
 // The runtime writes the connection details returned by Status() into a Secret.
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
+// PodLabels on the node pool requires list/watch so the runtime can count
+// component pods into Instance.status.components.
+// +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
 
-// =============================================================================
-// PROVIDER-SPECIFIC RBAC — Add markers for your operator's resources.
-// =============================================================================
-// Examples:
-//
-//   - Watch/manage operator CRs:
-//   // +kubebuilder:rbac:groups=<operator-api-group>,resources=<operator-resources>,verbs=get;list;watch;create;update;patch;delete
-//   // +kubebuilder:rbac:groups=<operator-api-group>,resources=<operator-resources>/status,verbs=get
-//   // +kubebuilder:rbac:groups=<operator-api-group>,resources=<operator-resources>/finalizers,verbs=update
-//
-//   - Access Kubernetes core resources:
-//   // +kubebuilder:rbac:groups="",resources=secrets;configmaps,verbs=get;list;watch
-//   // +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
-//
-//   - Access PVCs (if managing storage):
-//   // +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
+// Strimzi Kafka Operator resources (https://github.com/strimzi/strimzi-kafka-operator):
+// +kubebuilder:rbac:groups=kafka.strimzi.io,resources=kafkas;kafkanodepools,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=kafka.strimzi.io,resources=kafkas/status;kafkanodepools/status,verbs=get
+// +kubebuilder:rbac:groups=kafka.strimzi.io,resources=kafkas/finalizers;kafkanodepools/finalizers,verbs=update

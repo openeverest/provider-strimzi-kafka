@@ -12,6 +12,14 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
   - secrets
   verbs:
   - create
@@ -73,3 +81,30 @@ rules:
   - get
   - list
   - watch
+- apiGroups:
+  - kafka.strimzi.io
+  resources:
+  - kafkanodepools
+  - kafkas
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kafka.strimzi.io
+  resources:
+  - kafkanodepools/finalizers
+  - kafkas/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - kafka.strimzi.io
+  resources:
+  - kafkanodepools/status
+  - kafkas/status
+  verbs:
+  - get
