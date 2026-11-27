@@ -16,11 +16,12 @@ spec:
       type: kafka
       replicas: 1
 ---
-# KafkaNodePool — matches Strimzi examples/kafka/kafka-single-node.yaml shape.
+# KafkaNodePool — dual-role shape; name is <instance>-dual-role so multiple
+# Instances in one namespace cannot collide on a shared pool object.
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
 metadata:
-  name: dual-role
+  name: test-instance-dual-role
   labels:
     strimzi.io/cluster: test-instance
 spec:

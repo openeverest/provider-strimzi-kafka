@@ -63,7 +63,7 @@ spec:
     #         content: |
     #           kubectl -n $NAMESPACE delete instance/test-instance --wait=false
     #           kubectl -n $NAMESPACE patch kafka/test-instance -p '{"metadata":{"finalizers":null}}' --type merge
-    #           kubectl -n $NAMESPACE patch kafkanodepool/dual-role -p '{"metadata":{"finalizers":null}}' --type merge
+    #           kubectl -n $NAMESPACE patch kafkanodepool/test-instance-dual-role -p '{"metadata":{"finalizers":null}}' --type merge
     #     - wait:
     #         apiVersion: core.openeverest.io/v1alpha1
     #         kind: Instance

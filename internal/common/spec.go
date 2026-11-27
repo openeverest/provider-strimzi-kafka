@@ -14,9 +14,16 @@ const (
 	// ComponentTypeKafka is the engine component type in versions.yaml.
 	ComponentTypeKafka = "kafka"
 
-	// DualRoleNodePoolName is the KafkaNodePool metadata.name used for the
-	// dualRole topology. Matches Strimzi examples/kafka/kafka-with-dual-role-nodes.yaml.
-	DualRoleNodePoolName = "dual-role"
+	// DefaultKafkaVersion is the Kafka version used when Instance.spec.version
+	// (and the engine component version) are unset. Keep in sync with
+	// definition/versions.yaml defaultVersion.
+	DefaultKafkaVersion = "4.3.2"
+
+	// DualRoleNodePoolSuffix is appended to the Instance name to form the
+	// KafkaNodePool metadata.name. The pool name must be unique per namespace so
+	// two Instances cannot fight over a shared "dual-role" object via SSA
+	// ForceOwnership. Role shape still matches Strimzi dual-role examples.
+	DualRoleNodePoolSuffix = "dual-role"
 
 	// StrimziClusterLabel is required on KafkaNodePool to bind it to a Kafka CR.
 	// Source: Strimzi docs / examples (metadata.labels.strimzi.io/cluster).
@@ -27,3 +34,8 @@ const (
 	// ListenerTLS is the internal TLS listener name from Strimzi examples.
 	ListenerTLS = "tls"
 )
+
+// DualRoleNodePoolName returns the KafkaNodePool name for an Instance.
+func DualRoleNodePoolName(instanceName string) string {
+	return instanceName + "-" + DualRoleNodePoolSuffix
+}

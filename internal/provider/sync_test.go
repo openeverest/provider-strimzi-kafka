@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/openeverest/provider-strimzi-kafka/internal/common"
 )
 
 func TestReplicationSettings(t *testing.T) {
@@ -41,10 +43,15 @@ func TestBuildBrokerConfig(t *testing.T) {
 
 func TestMetadataVersionFor(t *testing.T) {
 	t.Parallel()
-	mv, ok := metadataVersionFor("4.3.2")
+	mv, ok := metadataVersionFor(common.DefaultKafkaVersion)
 	require.True(t, ok)
 	assert.Equal(t, "4.3-IV0", mv)
 
 	_, ok = metadataVersionFor("9.9.9")
 	assert.False(t, ok)
+}
+
+func TestDualRoleNodePoolName(t *testing.T) {
+	t.Parallel()
+	assert.Equal(t, "my-kafka-dual-role", common.DualRoleNodePoolName("my-kafka"))
 }

@@ -19,7 +19,7 @@ import (
 // (`metadata:` field), e.g. 4.3.2 → 4.3-IV0.
 // https://github.com/strimzi/strimzi-kafka-operator/blob/1.3.1/kafka-versions.yaml
 var metadataVersions = map[string]string{
-	"4.3.2": "4.3-IV0",
+	common.DefaultKafkaVersion: "4.3-IV0",
 }
 
 func metadataVersionFor(kafkaVersion string) (string, bool) {
@@ -34,7 +34,7 @@ func resolveKafkaVersion(c *controller.Context, engine corev1alpha1.ComponentSpe
 	if v := c.Instance().Spec.Version; v != "" {
 		return v
 	}
-	return "4.3.2"
+	return common.DefaultKafkaVersion
 }
 
 // replicationSettings mirrors Strimzi example configs:
@@ -72,19 +72,21 @@ func buildBrokerConfig(replicas int32) (*apiextensionsv1.JSON, error) {
 }
 
 func buildNodePool(c *controller.Context, engine corev1alpha1.ComponentSpec) *kafkav1.KafkaNodePool {
-	meta := c.ObjectMeta(common.DualRoleNodePoolName)
+	meta := c.ObjectMeta(common.DualRoleNodePoolName(c.Name()))
 	if meta.Labels == nil {
 		meta.Labels = map[string]string{}
 	}
 	meta.Labels[common.StrimziClusterLabel] = c.Name()
 
 	volID := int32(0)
+	deleteClaim := true
 	storage := kafkav1.KafkaNodePoolStorage{
 		Type: "jbod",
 		Volumes: []kafkav1.KafkaNodePoolStorageVol{{
 			ID:            &volID,
 			Type:          "persistent-claim",
 			Size:          engine.Storage.Size.String(),
+			DeleteClaim:   &deleteClaim,
 			KraftMetadata: "shared",
 		}},
 	}
@@ -92,12 +94,18 @@ func buildNodePool(c *controller.Context, engine corev1alpha1.ComponentSpec) *ka
 		storage.Volumes[0].Class = *engine.Storage.StorageClass
 	}
 
+	podLabels := c.PodLabels(common.ComponentEngine)
 	pool := &kafkav1.KafkaNodePool{
 		ObjectMeta: meta,
 		Spec: kafkav1.KafkaNodePoolSpec{
 			Replicas: *engine.Replicas,
 			Roles:    []string{"controller", "broker"},
 			Storage:  storage,
+			Template: &kafkav1.KafkaNodePoolTemplate{
+				Pod: &kafkav1.PodTemplate{
+					Metadata: &kafkav1.ResourceMetadata{Labels: podLabels},
+				},
+			},
 		},
 	}
 	if engine.Resources != nil {
