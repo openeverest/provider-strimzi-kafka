@@ -9,9 +9,9 @@ agents: 3
 image: rancher/k3s:v1.33.2-k3s1
 registries:
   create:
-    name: k3d-registry
+    name: k3d-registry-strimzi-kafka
     host: "0.0.0.0"
-    hostPort: "5000"
+    hostPort: "5002"
 options:
   k3d:
     wait: true

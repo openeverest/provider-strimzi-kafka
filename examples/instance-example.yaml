@@ -1,25 +1,30 @@
-# Example Instance CR for the provider-strimzi-kafka provider.
-# Apply this to your cluster to create a database instance.
+# Dual-role Kafka Instance (3 nodes) — matches Strimzi
+# examples/kafka/kafka-with-dual-role-nodes.yaml shape (RF=3, min.isr=2).
 #
 # Prerequisites:
 #   1. OpenEverest CRDs installed
-#   2. Provider CR applied (provider.yaml)
-#   3. Operator running
-#   4. Provider controller running
+#   2. provider-strimzi-kafka chart installed (includes Strimzi operator)
+#   3. Provider controller running
 apiVersion: core.openeverest.io/v1alpha1
 kind: Instance
 metadata:
-  name: example-instance
+  name: example-kafka
 spec:
   providerRef:
     name: strimzi-kafka
+  version: "4.3.2"
+  topology:
+    type: dualRole
   components:
     engine:
-      type: 
-      replicas: 1
+      type: kafka
+      replicas: 3
       resources:
+        requests:
+          cpu: "1"
+          memory: 2Gi
         limits:
           cpu: "1"
-          memory: 2G
+          memory: 2Gi
       storage:
-        size: 10Gi
+        size: 100Gi

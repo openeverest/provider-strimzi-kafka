@@ -34,40 +34,36 @@ spec:
         - assert:
             file: 00-assert.yaml
 
-    # TODO: enable once your provider implements Sync().
-    # Applies an Instance and asserts the provider creates the
-    # operator-native CR with the expected spec.
+    # TODO: enable once CRDs for kafka.strimzi.io are installed in the
+    # integration cluster (helm subchart) and Sync/Status are covered end-to-end.
     # - name: create-instance
     #   try:
     #     - apply:
     #         file: 10-create-instance.yaml
     #     - assert:
     #         file: 10-assert.yaml
-
-    # TODO: enable once your provider implements Status().
-    # The operator is scaled to 0 in integration tests, so simulate it
-    # marking the cluster ready by patching the operator-native CR status,
-    # then assert the Instance reports phase Running.
+    #
     # - name: instance-ready
     #   try:
     #     - script:
     #         content: |
-    #           kubectl patch <operator-resource>/test-instance --subresource status -n $NAMESPACE \
-    #             -p '{"status":{"state":"ready"}}' --type=merge
+    #           # Strimzi Ready condition (KafkaAssemblyOperator) + plain listener.
+    #           kubectl patch kafka/test-instance --subresource status -n $NAMESPACE --type=merge -p '{
+    #             "status":{
+    #               "conditions":[{"type":"Ready","status":"True"}],
+    #               "listeners":[{"name":"plain","bootstrapServers":"test-instance-kafka-bootstrap.'$NAMESPACE'.svc:9092"}]
+    #             }
+    #           }'
     #     - assert:
     #         file: 11-assert.yaml
-
-    # TODO: enable once your provider implements Cleanup().
-    # Deletes the Instance and waits for the provider to tear everything
-    # down. With the operator scaled to 0, you may need to clear finalizers
-    # on the operator-native CR (nothing processes them):
+    #
     # - name: delete-instance
     #   try:
     #     - script:
     #         content: |
     #           kubectl -n $NAMESPACE delete instance/test-instance --wait=false
-    #           kubectl -n $NAMESPACE patch <operator-resource>/test-instance \
-    #             -p '{"metadata":{"finalizers":null}}' --type merge
+    #           kubectl -n $NAMESPACE patch kafka/test-instance -p '{"metadata":{"finalizers":null}}' --type merge
+    #           kubectl -n $NAMESPACE patch kafkanodepool/dual-role -p '{"metadata":{"finalizers":null}}' --type merge
     #     - wait:
     #         apiVersion: core.openeverest.io/v1alpha1
     #         kind: Instance

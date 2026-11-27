@@ -1,14 +1,9 @@
-# provider-strimzi-kafka
-
-<!-- TODO(provider): replace the heading with the product name (e.g. "Percona Server for MongoDB
-Provider", "KubeAI Provider"). -->
+# Strimzi Kafka Provider
 
 > [!WARNING]
 > **Pre-alpha.** OpenEverest v2 and this provider are under active development. CRD schemas,
 > chart values and defaults change frequently, including in breaking ways, and there is no
 > supported upgrade path between versions yet. Not for production use.
-
-<!-- TODO(sdk): remove the pre-alpha banner and the status badge at v2 GA. -->
 
 [![Status](https://img.shields.io/badge/status-pre--alpha-orange)](https://github.com/openeverest/openeverest)
 [![CI](https://github.com/openeverest/provider-strimzi-kafka/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/openeverest/provider-strimzi-kafka/actions/workflows/ci.yaml)
@@ -16,16 +11,15 @@ Provider", "KubeAI Provider"). -->
 [![Go Reference](https://pkg.go.dev/badge/github.com/openeverest/provider-strimzi-kafka.svg)](https://pkg.go.dev/github.com/openeverest/provider-strimzi-kafka)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
-<!-- TODO(provider): one sentence — what this runs, and on top of which operator. -->
-Run **`<technology>`** on Kubernetes through [OpenEverest](https://github.com/openeverest/openeverest),
-backed by the [`<operator>`](https://example.com/operator).
+Run **Apache Kafka** on Kubernetes through [OpenEverest](https://github.com/openeverest/openeverest),
+backed by the [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator).
 
 ## What this is
 
 OpenEverest providers translate a single, technology-agnostic `Instance` custom resource into
 the native custom resources of an upstream Kubernetes operator — for databases, but equally
 for caches, message queues, object storage, or model-serving runtimes. This repository is the
-provider for `<technology>`: it owns the technology-specific knowledge — topologies, versions,
+provider for Apache Kafka: it owns the technology-specific knowledge — topologies, versions,
 parameters, backup wiring — so that users, the API server, and the UI stay technology-agnostic.
 
 > [!IMPORTANT]
@@ -37,8 +31,8 @@ parameters, backup wiring — so that users, the API server, and the UI stay tec
 flowchart LR
     U([User / API / UI]) -->|creates| I["Instance<br/>core.openeverest.io"]
     I --> P["provider-strimzi-kafka<br/>(this repository)"]
-    P -->|reconciles into| O["Operator CR<br/><operator-api-group>"]
-    O --> W["Upstream operator"]
+    P -->|reconciles into| O["Kafka / KafkaNodePool<br/>kafka.strimzi.io"]
+    O --> W["Strimzi Cluster Operator"]
     W --> R[("Workloads, Services,<br/>Secrets, PVCs")]
     P -->|status, endpoints,<br/>credentials| I
 ```
@@ -49,11 +43,9 @@ manages pods directly — all lifecycle work is delegated to the operator.
 
 ## Compatibility
 
-<!-- TODO(provider): keep this table accurate for every release. -->
-
-| provider-strimzi-kafka | OpenEverest | Operator | Kubernetes |
+| provider-strimzi-kafka | OpenEverest | Strimzi Operator | Kubernetes |
 |---|---|---|---|
-| `0.1.x` | `>= 2.0.0` | `x.y.z` | `1.30` – `1.34` |
+| `0.1.x` | `>= 2.0.0-alpha.1` | `1.3.1` | `1.32` – `1.34` |
 
 ## Capabilities
 
@@ -66,19 +58,19 @@ provider itself is covered under [Installation](#installation).
 
 | Capability | Status | Notes |
 |---|---|---|
-| Provisioning | ❌ | |
+| Provisioning | ✅ | dualRole KRaft (Kafka + KafkaNodePool) |
 | Horizontal scaling | ❌ | |
 | Vertical scaling (CPU / memory) | ❌ | |
 | Version upgrades | ❌ | |
 | Custom configuration | ❌ | |
 | Monitoring | ❌ | |
-| TLS | ❌ | |
+| TLS | ❌ | Internal TLS listener only (Strimzi default) |
 
 Stateful workloads additionally report:
 
 | Capability | Status | Notes |
 |---|---|---|
-| Persistent storage | ❌ | |
+| Persistent storage | ✅ | JBOD persistent-claim on the node pool |
 | Storage expansion | ❌ | |
 | Backups (on demand) | ❌ | |
 | Backups (scheduled) | ❌ | |
@@ -86,8 +78,6 @@ Stateful workloads additionally report:
 | Restore | ❌ | |
 
 ## Installation
-
-<!-- TODO(provider): confirm the published chart coordinates (org/repo) match where you publish. -->
 
 The provider chart is published as an OCI artifact:
 
@@ -98,9 +88,9 @@ helm install provider-strimzi-kafka \
   --namespace everest-system
 ```
 
-<!-- TODO(provider): keep whichever of the two bullets below is true, delete the other. -->
-- The operator is bundled as a chart dependency and is installed automatically.
-- The operator is **not** bundled — install it before installing this provider.
+- The [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator) is bundled as a
+  chart dependency and is installed automatically. Set
+  `strimzi-kafka-operator.enabled=false` when the cluster already runs it.
 
 Upgrade and uninstall:
 
@@ -129,14 +119,17 @@ metadata:
 spec:
   providerRef:
     name: strimzi-kafka
+  version: "4.3.2"
+  topology:
+    type: dualRole
   components:
     engine:
-      type: 
+      type: kafka
       replicas: 3
       resources:
         requests:
           cpu: 500m
-          memory: 2G
+          memory: 2Gi
       storage:
         size: 10Gi
 ```
@@ -163,15 +156,15 @@ Connection details, when the technology has any, are in the Secret named by
 <!-- BEGIN GENERATED: topologies -->
 | Topology | Default | Description |
 |---|---|---|
-| `` | ✅ | |
+| `dualRole` | ✅ | One KafkaNodePool; nodes run controller + broker (Strimzi dual-role / single-node examples) |
 <!-- END GENERATED: topologies -->
 
 ## Versions
 
 <!-- BEGIN GENERATED: versions -->
-| Version bundle | Default |  |
+| Version bundle | Default | Notes |
 |---|---|---|
-| | | |
+| `4.3.2` | ✅ | Strimzi 1.3.1 default Kafka; metadataVersion `4.3-IV0` |
 <!-- END GENERATED: versions -->
 
 Source of truth: [definition/versions.yaml](definition/versions.yaml).
