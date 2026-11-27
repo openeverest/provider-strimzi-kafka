@@ -15,6 +15,9 @@ package provider
 // +kubebuilder:rbac:groups=events.k8s.io,resources=events,verbs=create;patch
 // The runtime writes the connection details returned by Status() into a Secret.
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
+// PodLabels on the node pool requires list/watch so the runtime can count
+// component pods into Instance.status.components.
+// +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
 
 // Strimzi Kafka Operator resources (https://github.com/strimzi/strimzi-kafka-operator):
 // +kubebuilder:rbac:groups=kafka.strimzi.io,resources=kafkas;kafkanodepools,verbs=get;list;watch;create;update;patch;delete
