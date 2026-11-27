@@ -40,10 +40,12 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext:
-  # -- Run as non-root
+  # -- Run as non-root. The image sets USER 65532; no runAsUser or fsGroup here, so
+  # OpenShift's restricted-v2 SCC can assign IDs from the namespace range.
   runAsNonRoot: true
-  # -- Security context fsGroup
-  fsGroup: 65534
+  # -- Seccomp profile, required by the restricted Pod Security Standard
+  seccompProfile:
+    type: RuntimeDefault
 
 securityContext:
   # -- Disallow privilege escalation
@@ -56,13 +58,11 @@ securityContext:
   readOnlyRootFilesystem: true
   # -- Run as non-root user
   runAsNonRoot: true
-  # -- Run as user ID
-  runAsUser: 65534
 
 service:
   # -- Service type
   type: ClusterIP
-  # -- Service port for the HTTP server (validation/health endpoints)
+  # -- Service port for the HTTP server (health endpoints)
   port: 8082
   # -- The address the metrics endpoint binds to. Use "0" to disable.
   metricsBindAddress: ":8081"
@@ -124,9 +124,9 @@ provider:
   # used in other contexts where a short concise provider identifier is needed.
   shortName: strimzi-kafka
 
-# -- Default instance presets configuration
+# -- Default cluster instance presets configuration
 # Each preset must have 'name', 'enabled', and 'spec' fields.
-# The 'spec' field contains the full InstancePresetSpec.
+# The 'spec' field contains the full ClusterInstancePresetSpec.
 # Note: The provider shortName will be automatically added to each preset name.
 presets: []
   # Example preset structure:
@@ -157,6 +157,17 @@ extraVolumeMounts: []
 
 # -- Additional volumes to add to the pod
 extraVolumes: []
+
+admission:
+  # -- PEM serving certificate for the Instance admission webhook. Left empty,
+  # the chart generates one and keeps it across upgrades.
+  certs:
+    tls.crt: ""
+    tls.key: ""
+    ca.crt: ""
+  certManager:
+    # -- Issue the serving certificate with cert-manager, which must be installed.
+    enabled: false
 
 # -- Leader election configuration
 leaderElection:
