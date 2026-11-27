@@ -1,15 +1,23 @@
 # Component type version catalog.
-# Add new versions here when operator releases are available.
-# Name the default version per type via `defaultVersion`.
+# Kafka versions supported by the pinned Strimzi Cluster Operator
+# (charts/provider-strimzi-kafka/Chart.yaml → strimzi-kafka-operator 1.3.1).
+# Source: https://github.com/strimzi/strimzi-kafka-operator/blob/1.3.1/kafka-versions.yaml
+# Images: quay.io/strimzi/kafka:<operator>-kafka-<kafka> (Strimzi 1.3.1 release notes).
 #
-# Run `provider-sdk add component` to populate this file automatically.
-#
-# Example:
-# componentTypes:
-#   mongod:
-#     defaultVersion: "1.0.0"
-#     versions:
-#     - version: "1.0.0"
-#       image: example/my-database:1.0.0
+# Sync only sets Kafka.spec.kafka.version; the Cluster Operator selects the
+# matching image from STRIMZI_KAFKA_IMAGES. Catalog images are for the UI /
+# Provider CR and for optional Instance.spec.components.engine.image overrides.
 
-componentTypes: {}
+componentTypes:
+  kafka:
+    defaultVersion: "4.3.2"
+    versions:
+      - version: "4.3.2"
+        image: quay.io/strimzi/kafka:1.3.1-kafka-4.3.2
+
+# Version bundles — Instance.spec.version selects a bundle.
+defaultVersion: "4.3.2"
+versions:
+  - name: "4.3.2"
+    components:
+      engine: "4.3.2"
