@@ -241,13 +241,14 @@ kubectl logs -n everest-system deploy/provider-strimzi-kafka -f
 
 | Symptom | Where to look |
 |---|---|
-| `Instance` stuck in `Creating` | `kubectl describe instance <name>` conditions, then the provider logs |
+| `Instance` stuck in `Creating` / `Pending` | `kubectl describe instance <name>` conditions, then the provider logs |
 | No `Provider` resource in the cluster | Is the chart installed? Check the provider deployment logs |
 | `Instance` ignored entirely | `spec.providerRef.name` must be `strimzi-kafka` |
-| Operator resource created but no pods | Inspect the operator's custom resource status — the failure is upstream |
+| Operator resource created but no pods | Inspect the Kafka / KafkaNodePool status — the failure is upstream |
+| Admission rejects replica / version / storage edits | Horizontal scaling, upgrades, and storage changes are not supported yet |
+| Unexpected Kafka naming conflicts | Prefer one Kafka `Instance` per namespace (Strimzi Entity Operator guidance) |
 
-<!-- TODO(provider): add technology-specific gotchas (sysctl limits, storage class or GPU
-     requirements, node selectors, …). -->
+Deleting an `Instance` deletes its Kafka / KafkaNodePool and the PVCs (`deleteClaim: true`).
 
 ## Contributing
 
