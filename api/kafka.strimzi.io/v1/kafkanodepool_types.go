@@ -24,6 +24,22 @@ type KafkaNodePoolSpec struct {
 	Roles     []string                     `json:"roles"` // enum: controller, broker
 	Storage   KafkaNodePoolStorage         `json:"storage"`
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+	Template  *KafkaNodePoolTemplate       `json:"template,omitempty"`
+}
+
+// KafkaNodePoolTemplate configures Kubernetes resource templates for the pool.
+type KafkaNodePoolTemplate struct {
+	Pod *PodTemplate `json:"pod,omitempty"`
+}
+
+// PodTemplate configures the Kafka pods created for this pool.
+type PodTemplate struct {
+	Metadata *ResourceMetadata `json:"metadata,omitempty"`
+}
+
+// ResourceMetadata holds labels/annotations applied to a templated resource.
+type ResourceMetadata struct {
+	Labels map[string]string `json:"labels,omitempty"`
 }
 
 // KafkaNodePoolStorage configures storage for nodes in the pool.

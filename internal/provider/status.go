@@ -27,7 +27,7 @@ func (p *Provider) Status(c *controller.Context) (controller.Status, error) {
 	kafka := &kafkav1.Kafka{}
 	if err := c.Get(kafka, c.Name()); err != nil {
 		if controller.IsNotFound(err) {
-			return controller.Progressing("Waiting for Kafka resource"), nil
+			return withDesiredReplicas(c, controller.Progressing("Waiting for Kafka resource")), nil
 		}
 		return controller.Status{}, err
 	}
@@ -35,9 +35,9 @@ func (p *Provider) Status(c *controller.Context) (controller.Status, error) {
 	if ready := meta.FindStatusCondition(kafka.Status.Conditions, "Ready"); ready != nil && ready.Status == metav1.ConditionTrue {
 		details, ok := connectionDetailsFromKafka(kafka)
 		if !ok {
-			return controller.Progressing("Kafka is Ready; waiting for listener addresses"), nil
+			return withDesiredReplicas(c, controller.Progressing("Kafka is Ready; waiting for listener addresses")), nil
 		}
-		return controller.ReadyWithConnectionDetails(details), nil
+		return withDesiredReplicas(c, controller.ReadyWithConnectionDetails(details)), nil
 	}
 
 	// Strimzi uses type=NotReady (status=True) while deploying and when a
@@ -51,10 +51,18 @@ func (p *Provider) Status(c *controller.Context) (controller.Status, error) {
 		if msg == "" {
 			msg = "Kafka cluster is not ready"
 		}
-		return controller.Progressing(msg), nil
+		return withDesiredReplicas(c, controller.Progressing(msg)), nil
 	}
 
-	return controller.Progressing("Waiting for Strimzi to report Kafka status"), nil
+	return withDesiredReplicas(c, controller.Progressing("Waiting for Strimzi to report Kafka status")), nil
+}
+
+func withDesiredReplicas(c *controller.Context, st controller.Status) controller.Status {
+	engine, ok := c.Instance().Spec.Components[common.ComponentEngine]
+	if !ok || engine.Replicas == nil {
+		return st
+	}
+	return st.WithDesiredReplicas(common.ComponentEngine, *engine.Replicas)
 }
 
 func connectionDetailsFromKafka(kafka *kafkav1.Kafka) (controller.ConnectionDetails, bool) {
